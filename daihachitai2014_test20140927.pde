@@ -28,10 +28,11 @@ void setup(){
   
   imageMode(CENTER);
   noCursor();
+  colorMode(HSB);
   
   // Arduino
   println(Serial.list());
-  port = new Serial(this, Serial.list()[5], 9600);
+  port = new Serial(this, Serial.list()[2], 9600);
   
   
   // load data
@@ -40,17 +41,17 @@ void setup(){
     player[i] = minim.loadFile("Fan/Fan"+i+".mp3");
   }
   
-  explosions = new PImage[23];
+  explosions = new PImage[24];
   for(int i=0; i<explosions.length; ++i){
     explosions[i] = loadImage("explosions/explosion_"+nf(i,2)+".png");
   }
   
-  mawarunyoros = new PImage[22];
+  mawarunyoros = new PImage[24];
   for(int i=0; i<mawarunyoros.length; ++i){
     mawarunyoros[i] = loadImage("mawarunyoros/mawarunyoro_"+nf(i,2)+".png");
   }
   
-  linecircles = new PImage[22];
+  linecircles = new PImage[95];
   for(int i=0; i<linecircles.length; ++i){
     linecircles[i] = loadImage("linecircles/linecircle_"+nf(i,2)+".png");
   }
@@ -59,6 +60,7 @@ void setup(){
     untouched_count[i] = 0;
     touched[i] = false;
   }
+  
 }
 
 void draw(){
@@ -72,8 +74,10 @@ void drawStick(int stick_id, boolean stickTouched){
 //    println("untouched:" + !touched[stick_id]);
 //    println("stickTouched:" + stickTouched);
   if(stickTouched && !pTouched[stick_id]){
-    println("hello");
-    sprites.add(new Sprite());
+    int image_id = (int)random(0,3);
+    if(image_id==0){ sprites.add(new Sprite(explosions, color(random(0,255),255,255))); }
+    else if(image_id==1){sprites.add(new Sprite(mawarunyoros, color(random(0,255),255,255)));}
+    else if(image_id==2){sprites.add(new Sprite(linecircles, color(random(0,255),255,255)));}
     int sound_id = (int)random(0,SOUND_NUM);
     player[sound_id].rewind();
     player[sound_id].play();
@@ -122,57 +126,24 @@ void stop()
   super.stop();
 } 
 
-//class Sprite{
-//  int explosion_image_count = 0;
-//
-//  
-//  Sprite(){
-//    
-//  }
-//  
-//  void draw(){
-//    image(explosions[explosion_image_count], width/2, height/2);
-//    ++explosion_image_count;
-//  }
-//  
-//  boolean isDead(){
-//    return (explosion_image_count >= explosions.length);
-//  }
-//}
-
-//class Sprite{
-//  int mawarunyoro_image_count = 0;
-//
-//  
-//  Sprite(){
-//    
-//  }
-//  
-//  void draw(){
-//    image(mawarunyoros[mawarunyoro_image_count], width/2, height/2);
-//    ++mawarunyoro_image_count;
-//  }
-//  
-//  boolean isDead(){
-//    return (mawarunyoro_image_count >= mawarunyoros.length);
-//  }
-//}
-
 class Sprite{
-  int linecircle_image_count = 0;
-
+  int image_count = 0;
+  PImage[] images;
+  color col;
   
-  Sprite(){
-    
+  Sprite(PImage[] _images, color _col){
+    images = _images;
+    col = _col;
   }
   
   void draw(){
-    image(linecircles[mawarunyoro_image_count], width/2, height/2);
-    ++linecircle_image_count;
+    tint(col);
+    image(images[image_count], width/2, height/2);
+    ++image_count;
   }
   
   boolean isDead(){
-    return (linecircle_image_count >= linecircles.length);
+    return (image_count >= images.length);
   }
 }
 
